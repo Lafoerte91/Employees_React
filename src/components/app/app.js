@@ -11,9 +11,9 @@ class App extends Component {
     super(props);
     this.state = {
       data: [
-        { name: 'John C.', salary: 800, increase: false, id: 1 },
-        { name: 'Alex M.', salary: 3000, increase: true, id: 2 },
-        { name: 'Carl W.', salary: 15000, increase: false, id: 3 },
+        { name: 'John C.', salary: 800, increase: false, rise: true, id: 1 },
+        { name: 'Alex M.', salary: 3000, increase: true, rise: false, id: 2 },
+        { name: 'Carl W.', salary: 15000, increase: false, rise: false, id: 3 },
       ],
     };
   }
@@ -26,10 +26,43 @@ class App extends Component {
     })
   }
 
+  addItem = (name, salary) => {
+    const newItem = {
+      name, 
+      salary,
+      increase: false,
+      rise: false,
+      id: this.maxId++
+    }
+
+    this.setState(({ data }) => {
+      const newArr = [...data, newItem]
+
+      return {
+        data: newArr
+      }
+    })
+  }
+
+  onToggleProp = (id, prop) => {
+    this.setState(({ data }) => ({
+      data: data.map(item => {
+        if(item.id  == id) {
+          return {...item, [prop]: !item[prop]}
+        }
+
+        return item
+      })
+    }))
+  }
+
   render() {
+    const employees = this.state.data.length
+    const increased = this.state.data.filter(item => item.increase).length
+
     return (
       <div className="app">
-        <AppInfo />
+        <AppInfo employees={employees} increased={increased} />
 
         <div className="search-panel">
           <SearchPanel />
@@ -37,11 +70,14 @@ class App extends Component {
           <AppFilter />
         </div>
 
-        <EmployersList data={this.state.data} onDelete={this.deleteItem} />
+        <EmployersList 
+          data={this.state.data} 
+          onDelete={this.deleteItem}
+          onToggleProp={this.onToggleProp} />
 
         <EmployersAddForm />
       </div>
-    );
+    );  
   }
 }
 
